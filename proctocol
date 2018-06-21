@@ -1,0 +1,207 @@
+"""
+code	详细描述
+200	操作成功
+201	客户端版本不对，需升级sdk
+301	被封禁
+302	用户名或密码错误
+315	IP限制
+403	非法操作或没有权限
+404	对象不存在
+405	参数长度过长
+406	对象只读
+408	客户端请求超时
+413	验证失败(短信服务)
+414	参数错误
+415	客户端网络问题
+416	频率控制
+417	重复操作
+418	通道不可用(短信服务)
+419	数量超过上限
+422	账号被禁用
+431	HTTP重复请求
+500	服务器内部错误
+503	服务器繁忙
+508	消息撤回时间超限
+509	无效协议
+514	服务不可用
+998	解包错误
+999	打包错误
+
+群相关错误码
+801	群人数达到上限
+802	没有权限
+803	群不存在
+804	用户不在群
+805	群类型不匹配
+806	创建群数量达到限制
+807	群成员状态错误
+808	申请成功
+809	已经在群内
+810	邀请成功
+
+音视频、白板通话相关错误码
+9102	通道失效
+9103	已经在他端对这个呼叫响应过了
+11001	通话不可达，对方离线状态
+
+聊天室相关错误码
+13001	IM主连接状态异常
+13002	聊天室状态异常
+13003	账号在黑名单中,不允许进入聊天室
+13004	在禁言列表中,不允许发言
+13005	用户的聊天室昵称、头像或成员扩展字段被反垃圾
+
+特定业务相关错误码
+10431	输入email不是邮箱
+10432	输入mobile不是手机号码
+10433	注册输入的两次密码不相同
+10434	企业不存在
+10435	登陆密码或帐号不对
+10436	app不存在
+10437	email已注册
+10438	手机号已注册
+10441	app名字已经存在
+"""
+
+
+"""
+消息功能
+参数	                 类型	必须	                   说明
+
+from	            String	是	发送者token，用户帐号，最大32字符，必须保证一个APP内唯一
+ope	                int	    是	0：点对点个人消息，1：聊天室 2: 服务器其他返回414
+to	                String	是	ope==0是表示token即用户id，ope==1表示tid即聊天室id, ope==2表示服务器
+type	            int	    是	'login': 1,
+                                'logout': 2,
+                                'register': 3,
+                                'unregister': 4,
+                                'heartbeat': 5,
+                                'speak_public_room_server': 6,
+                                'sync_public_room_server': 7,
+                                'create_public_room_client': 8,
+                                'destroy_public_room_client': 9,
+                                'create_peer_to_peer_chat_server': 10,
+                                'destroy_peer_to_peer_chat_server': 11,
+                                'download_file': 12,
+                                'upload_file': 13,
+                                'edit_public_information': 14,
+                                'save_public_room_message': 15,
+                                'save_peer_to_peer_chat_message': 16,
+                                'gain_public_room_message': 17,
+                                'gain_peer_to_peer_chat_message': 18,
+                                'speak_peer_to_peer_chat_server': 19,
+                                'sync_peer_to_peer_chat_server': 20,
+                                'get_alive_list': 21,
+                                'reply_alive_list': 22,
+                                'peer_server_address_push': 23,
+                                'peer_server_address_pull': 24,
+                                'user_info_pull': 25,
+                                'user_info_push': 26
+data	            String	是	请参考下方消息示例说明中对应消息的body字段，最大长度5000字符，为一个JSON串
+option              String	否	发消息时特殊指定的行为选项,JSON格式，可用于指定消息的漫游，存云端历史，发送方多端同步，推送，消息抄送等特殊行为;option中字段不填时表示默认值 ，option示例:
+                                {"push":false,"roam":true,"history":false,"sendersync":true,"badge":false,"needPushNick":true}
+                                字段说明：
+                                1. roam: 该消息是否需要漫游，默认true（需要app开通漫游消息功能）； 
+                                2. history: 该消息是否存云端历史，默认true；
+                                 3. sendersync: 该消息是否需要发送方多端同步，默认true；
+                                 4. badge:该消息是否需要计入到未读计数中，默认false;
+                                5. needPushNick: 推送文案是否需要带上昵称，不设置该参数时默认true;
+                                6. persistent: 是否需要存离线消息，不设置该参数时默认false。
+forcepushlist	    String	否	发送群消息时的强推（@操作）用户列表，格式为JSONArray，如["token1","token2"]。若forcepushall为true，则forcepushlist为除发送者外的所有有效群成员
+forcepushcontent	String	否	发送群消息时，针对强推（@操作）列表forcepushlist中的用户，强制推送的内容
+forcepushall	    String	否	发送群消息时，强推（@操作）列表是否为群里除发送者外的所有有效成员，true或false，默认为false
+markRead	        int	    否	可选，群消息是否需要已读业务（仅对群消息有效），0:不需要，1:需要
+"""
+
+
+"""
+创建聊天室，在消息功能data中的字段key名称
+
+参数	                 类型	必须	       说明
+creator	            String	是	聊天室属主的账号id
+name	            String	是	聊天室名称，长度限制128个字符
+announcement	    String	否	公告，长度限制4096个字符
+broadcasturl	    String	否	直播地址，长度限制1024个字符
+ext	                String	否	扩展字段，最长4096字符
+queuelevel	        int	    否	队列管理权限：0:所有人都有权限变更队列，1:只有主播管理员才能操作变更。默认0
+"""
+
+
+"""
+用户登录成功后，服务器推送相关信息，在消息功能data中的字段key名称
+
+参数	                 类型	必须	       说明
+yourself            tuple   是   (address, port)
+token               String  是   令牌，目前为空
+time                String  是   时间戳
+time                String  是   时间戳
+"""
+
+
+"""
+创建点对点通信，在消息功能data中的字段key名称
+
+参数	                 类型	必须	       说明
+time                String  是   时间戳
+"""
+
+"""
+服务回应点对点通信，在消息功能data中的字段key名称
+
+参数	                 类型	必须	       说明
+from_port                String  是   时间戳
+from_addr                String  是   时间戳
+to_port                  String  是   时间戳
+to_addr                String  是   时间戳
+"""
+
+
+"""
+保存记录和聊天信息，在消息功能data中的字段key名称
+
+参数	                 类型	必须	       说明
+time    	        String	是	开始时间，ms
+content             String	是  消息内容
+"""
+
+
+"""
+获取历史记录，在消息功能data中的字段key名称
+
+参数	                 类型	必须	       说明
+begintime	        String	是	开始时间，ms
+endtime	            String	是	截止时间，ms
+limit	            int	    是	本次查询的消息条数上限(最多100条),小于等于0，或者大于100，会提示参数错误
+reverse	            int	    否	1按时间正序排列，2按时间降序排列。其它返回参数414错误.默认是按降序排列
+"""
+
+
+"""
+消息功能
+
+功能	                             限制说明
+消息内容	              body 字段最大长度 5000 字符
+图片消息	              无限制，建议应用根据业务场景进行限制
+语音消息	              录制时长默认 120 秒(支持自定义配置)，文件大小无限制，建议应用根据业务场景进行限制
+视频消息	              视频时长不限，文件大小无限制，建议应用根据业务场景进行限制
+文件消息	              SDK 上传大小无限制，服务端上传文件最大 15 M，建议应用根据业务场景进行限制
+离线消息	              点对点消息下发 30 天内最近 100个会话，每个会话最多 100 条离线消息；每个群聊会话最多下发 100 条离线消息
+漫游消息	              自动漫游 7 天内最近 100 个会话，每个会话最近的 100 条消息
+聊天室历史记录获取时长	  10 天
+
+用户资料
+
+参数	             类型	                  说明
+username	    String	用户帐号，最大长度 32 字符，必须保证一个 APP 内唯一
+nickname	    String	用户昵称，最大长度 64 字符
+password        String  用户密码，最大长度256 md5字符
+icon	        String	用户 icon，最大长度 1024 字符
+sign	        String	用户签名，最大长度 256 字符
+email	        String	用户 email，最大长度 64 字符
+birth	        String	用户生日，最大长度 16 字符
+mobile	        String	用户 mobile，最大长度 32 字符，只支持国内号码
+gender	        int	    用户性别，0 表示未知，1 表示男，2 女表示女，其它会报参数错误
+last_ip_addr    String  时间戳
+create_time     Data    时间格式
+discription     String  描述信息
+"""
